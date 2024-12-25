@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  go-simple:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    ports:
+      - "8081:8081"
