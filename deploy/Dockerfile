@@ -1,29 +1,25 @@
-# Gunakan image Go resmi
-FROM golang:1.21-alpine
+FROM golang:1.21.0
 
-# Set environment
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
-
-# Set working directory
+# Set destination for COPY
 WORKDIR /app
 
-# Copy go.mod dan go.sum untuk cache
+# Download Go modules
 COPY go.mod ./
-
-# Unduh dependencies
 RUN go mod download
 
-# Copy semua file ke dalam container
-COPY src ./src
+# Copy the source code. Note the slash at the end, as explained in
+# https://docs.docker.com/engine/reference/builder/#copy
+COPY src/*.go ./
 
-# Build aplikasi
-RUN go build -o main ./src
+# Build
+RUN CGO_ENABLED=0 GOOS=linux go build -o /golang-docker
 
-# Expose port 8081 untuk HTTP server
+# Optional:
+# To bind to a TCP port, runtime parameters must be supplied to the docker command.
+# But we can document in the Dockerfile what ports
+# the application is going to listen on by default.
+# https://docs.docker.com/engine/reference/builder/#expose
 EXPOSE 8081
 
-# Jalankan aplikasi
-CMD ["./main"]
+# Run
+CMD ["/golang-docker"]
